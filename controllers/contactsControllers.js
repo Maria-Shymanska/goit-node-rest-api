@@ -1,8 +1,5 @@
 import * as contactsService from "../services/contactsServices.js";
-import {
-  contactAddSchema,
-  contactUpdateSchema,
-} from "../schemas/contactsSchemas.js";
+
 import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res, next) => {
@@ -82,5 +79,19 @@ export const updateContact = async (req, res, next) => {
     res.status(200).json(updatedContact);
   } catch (error) {
     next(error);
+  }
+};
+
+export const updateStatusContact = async (req, res, next) => {
+  const { contactId } = req.params;
+  const contact = await contactsService.updateStatusContact(
+    contactId,
+    req.body
+  );
+
+  if (contact) {
+    res.json(contact);
+  } else {
+    next(HttpError(404));
   }
 };

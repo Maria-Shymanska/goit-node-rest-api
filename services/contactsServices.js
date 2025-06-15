@@ -1,17 +1,16 @@
 import { readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
-
-const contactsPath = resolve("db", "contacts.json");
+import Contact from "../db/contacts.js";
 
 export async function listContacts() {
-  const data = await readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
+  return await Contact.findAll();
 }
 
 export async function getContactById(contactId) {
-  const contacts = await listContacts();
-  return contacts.find((c) => c.id === contactId) || null;
+  return await Contact.findByPk(contactId);
 }
+
+const contactsPath = resolve("db", "contacts.json");
 
 export async function removeContact(contactId) {
   const contacts = await listContacts();

@@ -1,7 +1,12 @@
 import { DataTypes } from "sequelize";
-import sequelize from "./sequelize";
+import sequelize from "./sequelize.js";
 
-export const Contact = sequelize.define("contact", {
+const Contact = sequelize.define("contact", {
+  id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    allowNull: false,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -9,6 +14,9 @@ export const Contact = sequelize.define("contact", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      isEmail: true,
+    },
   },
   phone: {
     type: DataTypes.STRING,
@@ -19,3 +27,13 @@ export const Contact = sequelize.define("contact", {
     defaultValue: false,
   },
 });
+
+Contact.sync({ force: false })
+  .then(() => {
+    console.log("Contact table created successfully.");
+  })
+  .catch((error) => {
+    console.error("Error creating Contact table:", error);
+  });
+
+export default Contact;

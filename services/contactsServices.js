@@ -1,4 +1,4 @@
-import { Contact } from "../db/contacts.js";
+import Contact from "../db/contacts.js";
 
 export async function listContacts() {
   return await Contact.findAll();
@@ -9,29 +9,21 @@ export async function getContactById(contactId) {
 }
 
 export async function addContact(name, email, phone) {
-  return await Contact.create({ name, email, phone });
+  const id = Math.random().toString(36).slice(2, 12) + Date.now();
+  const newContact = await Contact.create({ id, name, email, phone });
+  return newContact;
 }
 
-export async function removeContact(contactId) {
-  const contact = await getContactById(contactId);
-
+export async function updateContact(id, data) {
+  const contact = await Contact.findByPk(id);
   if (!contact) return null;
+  await contact.update(data);
+  return contact;
+}
 
+export async function removeContact(id) {
+  const contact = await Contact.findByPk(id);
+  if (!contact) return null;
   await contact.destroy();
-
   return contact;
-}
-
-export async function updateContact(contactId, updates) {
-  const contact = await getContactById(contactId);
-
-  if (!contact) return null;
-
-  await contact.update(updates);
-
-  return contact;
-}
-
-export async function updateStatusContact(contactId, updates) {
-  return await updateContact(contactId, updates);
 }

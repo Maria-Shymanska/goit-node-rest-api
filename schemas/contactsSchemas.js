@@ -1,21 +1,21 @@
 import Joi from "joi";
 
 export const createContactSchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string().min(3).max(30).required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().required(),
+  phone: Joi.string()
+    .pattern(/^[0-9]+$/)
+    .required(),
 });
 
 export const updateContactSchema = Joi.object({
-  name: Joi.string(),
-  email: Joi.string().email(),
-  phone: Joi.string(),
-})
-  .or("name", "email", "phone")
-  .messages({
-    "object.missing": "Body must have at least one field",
-  });
+  name: Joi.string().min(3).max(30).optional(),
+  email: Joi.string().email().optional(),
+  phone: Joi.string()
+    .pattern(/^[0-9]+$/)
+    .optional(),
+}).or("name", "email", "phone");
 
-export const updateStatusContactSchema = Joi.object({
+export const updateFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required(),
-});
+}).required();

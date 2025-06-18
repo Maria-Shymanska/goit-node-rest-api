@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import "dotenv/config";
 
+// Створюємо екземпляр Sequelize
 const sequelize = new Sequelize({
   dialect: process.env.DATABASE_DIALECT,
   host: process.env.DB_HOST,
@@ -20,6 +21,9 @@ const sequelize = new Sequelize({
   try {
     await sequelize.authenticate();
     console.log("✅ Successfully connected to database");
+
+    await sequelize.sync(); // Створює таблиці (якщо ще не існують)
+    console.log("✅ All models synced");
   } catch (error) {
     console.log("❌ Failed to connect to database");
     console.error(error);

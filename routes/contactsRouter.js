@@ -1,35 +1,40 @@
 import express from "express";
 import {
+  createContactSchema,
+  updateContactSchema,
+  updateFavoriteSchema,
+} from "../schemas/contactsSchemas.js";
+
+import validateBody from "../helpers/validateBody.js";
+
+import {
   getAllContacts,
   getOneContact,
   deleteContact,
   createContact,
-  updateContact,
   updateStatusContact,
 } from "../controllers/contactsControllers.js";
-import validateBody from "../helpers/validateBody.js";
-import {
-  createContactSchema,
-  updateContactSchema,
-  updateStatusContactSchema,
-} from "../schemas/contactsSchemas.js";
 
-const contactsRouter = express.Router();
+const router = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+// Всі контакти
+router.get("/", getAllContacts);
 
-contactsRouter.get("/:id", getOneContact);
+// Конкретний контакт за ID
+router.get("/:id", getOneContact);
 
-contactsRouter.delete("/:id", deleteContact);
+// Створити новий контакт - тут валідація тіла за createContactSchema
+router.post("/", validateBody(createContactSchema), createContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+// Оновити контакт - тут валідація тіла за updateContactSchema
+router.put("/:id", validateBody(updateContactSchema), updateStatusContact);
 
-contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
-
-contactsRouter.patch(
-  "/:contactId/favorite",
-  validateBody(updateStatusContactSchema),
+router.patch(
+  "/:id/favorite",
+  validateBody(updateFavoriteSchema),
   updateStatusContact
 );
 
-export default contactsRouter;
+router.delete("/:id", deleteContact);
+
+export default router;

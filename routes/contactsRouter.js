@@ -1,5 +1,14 @@
 import express from "express";
 import {
+  getAllContacts,
+  getOneContact,
+  createContact,
+  updateContact,
+  updateStatusContact,
+  deleteContact,
+} from "../controllers/contactsControllers.js";
+
+import {
   createContactSchema,
   updateContactSchema,
   updateFavoriteSchema,
@@ -7,27 +16,14 @@ import {
 
 import validateBody from "../helpers/validateBody.js";
 
-import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateStatusContact,
-} from "../controllers/contactsControllers.js";
-
 const router = express.Router();
 
-// Всі контакти
 router.get("/", getAllContacts);
-
-// Конкретний контакт за ID
 router.get("/:id", getOneContact);
 
-// Створити новий контакт - тут валідація тіла за createContactSchema
 router.post("/", validateBody(createContactSchema), createContact);
 
-// Оновити контакт - тут валідація тіла за updateContactSchema
-router.put("/:id", validateBody(updateContactSchema), updateStatusContact);
+router.put("/:id", validateBody(updateContactSchema), updateContact);
 
 router.patch(
   "/:id/favorite",

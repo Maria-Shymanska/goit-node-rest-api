@@ -19,8 +19,7 @@ app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((err, _req, res, _next) => {
-  console.error("❌ ERROR STACK:", err.stack);
+app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
 });
@@ -28,5 +27,5 @@ app.use((err, _req, res, _next) => {
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log(`Server is running. Use our API on port: ${port}`);
+  console.log("Server is running. Use our API on port: 3000");
 });

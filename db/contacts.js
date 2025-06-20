@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../db/sequelize.js";
+import sequelize from "./sequelize.js";
 
 const Contact = sequelize.define("contact", {
   name: {
@@ -9,9 +9,6 @@ const Contact = sequelize.define("contact", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      isEmail: true,
-    },
   },
   phone: {
     type: DataTypes.STRING,
@@ -22,5 +19,7 @@ const Contact = sequelize.define("contact", {
     defaultValue: false,
   },
 });
+
+// Contact.sync();
 
 export default Contact;

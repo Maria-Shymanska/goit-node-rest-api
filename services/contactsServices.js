@@ -9,8 +9,7 @@ export async function getContactById(contactId) {
 }
 
 export async function addContact({ name, email, phone }) {
-  const id = Math.random().toString(36).slice(2, 8) + Date.now();
-  return await Contact.create({ id, name, email, phone });
+  return await Contact.create({ name, email, phone });
 }
 
 export async function updateContact(id, data) {

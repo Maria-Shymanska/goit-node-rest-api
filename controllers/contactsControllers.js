@@ -32,7 +32,7 @@ export const createContact = async (req, res) => {
 
 export const updateContact = async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.updateContactById(id, req.body);
+  const result = await contactsService.updateContact(id, req.body);
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -42,7 +42,7 @@ export const updateContact = async (req, res) => {
 export const updateStatusContact = async (req, res) => {
   const { id } = req.params;
   const { favorite } = req.body;
-  const result = await contactsService.updateContactById(id, { favorite });
+  const result = await contactsService.updateStatusContact(id, { favorite });
   if (!result) {
     throw HttpError(404, "Not found");
   }

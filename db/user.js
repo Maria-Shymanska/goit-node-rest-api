@@ -2,20 +2,18 @@ import { DataTypes } from "sequelize";
 import sequelize from "../db/sequelize.js";
 
 const User = sequelize.define("user", {
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true,
-    },
-  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
   subscription: {
-    type: DataTypes.ENUM("starter", "pro", "business"),
+    type: DataTypes.ENUM,
+    values: ["starter", "pro", "business"],
     defaultValue: "starter",
   },
   token: {
@@ -23,7 +21,5 @@ const User = sequelize.define("user", {
     defaultValue: null,
   },
 });
-
-await User.sync({ alter: true });
 
 export default User;

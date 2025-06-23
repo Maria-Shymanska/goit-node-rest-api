@@ -1,14 +1,15 @@
 import express from "express";
-import validateBody from "../helpers/validateBody.js";
-import { authRegisterSchema } from "../schemas/authSchema.js";
-import authControllers from "../controllers/authControllers.js";
+import {
+  register,
+  login,
+  logout,
+  getCurrent,
+} from "../controllers/authControllers.js";
+import { authenticate } from "../middleware/authenticate.js";
 
-const authRouter = express.Router();
+const router = express.Router();
 
-authRouter.post(
-  "/register",
-  validateBody(authRegisterSchema),
-  authControllers.registerController
-);
-
-export default authRouter;
+router.post("/register", register);
+router.post("/login", login);
+router.post("/logout", authenticate, logout);
+router.get("/current", authenticate, getCurrent);

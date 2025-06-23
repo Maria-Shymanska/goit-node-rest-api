@@ -29,9 +29,7 @@ const Contact = sequelize.define("contact", {
   },
 });
 
-Contact.belongsTo(User, { foreignKey: 'owner' });
-User.hasMany(Contact, { foreignKey: 'owner' });
-
-export default Contact; 
+Contact.belongsTo(User, { foreignKey: "owner" });
+User.hasMany(Contact, { foreignKey: "owner" });
 
 export default Contact;

@@ -3,7 +3,8 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import authRouter from "./routes/authRouter.js";
-import { authenticate } from "./middleware/authenticate.js";
+import contactsRouter from "./routes/contactsRouter.js";
+import { authenticate } from "./middleware/authtenticate.js";
 
 import "./db/sequelize.js";
 const app = express();

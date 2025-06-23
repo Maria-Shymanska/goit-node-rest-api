@@ -1,9 +1,8 @@
-import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../db/user.js";
 import HttpError from "../helpers/HttpError.js";
-import { registerSchema, loginSchema } from "../schemas/authSchemas.js";
+import { registerSchema, loginSchema } from "../schemas/authSchema.js";
 import dotenv from "dotenv";
 
 dotenv.config();

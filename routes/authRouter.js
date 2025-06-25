@@ -3,15 +3,24 @@ import {
   register,
   login,
   logout,
-  getCurrent,
+  current,
+  updateSubscription,
 } from "../controllers/authControllers.js";
-import { authenticate } from "../middleware/authtenticate.js";
+import { userSchema, subscriptionSchema } from "../schemas/authSchema.js";
+import validateBody from "../helpers/validateBody.js";
+import auth from "../helpers/auth.js";
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/logout", authenticate, logout);
-router.get("/current", authenticate, getCurrent);
+authRouter.post("/register", validateBody(userSchema), register);
+authRouter.post("/login", validateBody(userSchema), login);
+authRouter.post("/logout", auth, logout);
+authRouter.get("/current", auth, current);
+authRouter.patch(
+  "/subscription",
+  auth,
+  validateBody(subscriptionSchema),
+  updateSubscription
+);
 
-export default router;
+export default authRouter;

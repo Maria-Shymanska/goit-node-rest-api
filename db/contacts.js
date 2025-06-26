@@ -23,13 +23,19 @@ const Contact = sequelize.define("contact", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: "Users",
+      model: User,
       key: "id",
     },
   },
 });
 
-Contact.belongsTo(User, { foreignKey: "owner" });
-User.hasMany(Contact, { foreignKey: "owner" });
+Contact.belongsTo(User, {
+  foreignKey: "owner",
+  onDelete: "CASCADE",
+});
+
+User.hasMany(Contact, {
+  foreignKey: "owner",
+});
 
 export default Contact;

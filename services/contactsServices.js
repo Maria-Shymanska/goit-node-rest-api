@@ -1,15 +1,17 @@
 import Contact from "../db/contacts.js";
 
 export async function listContacts() {
-  return await Contact.findAll();
+  return await Contact.findAll({
+    where: { owner: ownerId },
+  });
 }
 
-export async function getContactById(contactId) {
-  return await Contact.findByPk(contactId);
+export async function getContactById(id, owner) {
+  return await Contact.findOne({ where: { id, owner } });
 }
 
-export async function addContact({ name, email, phone }) {
-  return await Contact.create({ name, email, phone });
+export async function addContact({ name, email, phone, owner }) {
+  return await Contact.create({ name, email, phone, owner });
 }
 
 export async function updateContact(id, data) {

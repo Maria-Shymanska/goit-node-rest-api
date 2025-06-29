@@ -1,93 +1,56 @@
-import { authService } from "../services/authServices.js";
-import HttpError from "../helpers/HttpError.js";
-import jwt from "jsonwebtoken";
+import controllerWrapper from "../helpers/controllerWrapper.js";
+import * as authService from "../services/authServices.js";
 
-const { JWT_SECRET } = process.env;
+const register = async (req, res) => {
+  const newUser = await authService.registerUser(req.body);
 
-export const register = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const registeredUser = await authService.getUserByEmail(email);
-    if (registeredUser) {
-      throw HttpError(409, "Email in use");
-    }
-    const user = await authService.register(email, password);
-    res.status(201).json({
-      user: {
-        email: user.email,
-        subscription: user.subscription,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+  res.status(201).json({
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
+  });
 };
 
-export const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const user = await authService.getUserByEmail(email);
-    if (!user) {
-      throw HttpError(401, "Email or password is wrong");
-    }
-    const isPasswordValid = await authService.verifyPassword(
-      password,
-      user.password
-    );
-    if (!isPasswordValid) {
-      throw HttpError(401, "Email or password is wrong");
-    }
-
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-      expiresIn: "24h",
-    });
-    await authService.updateToken(user.id, token);
-    res.status(200).json({
-      token,
-      user: {
-        email: user.email,
-        subscription: user.subscription,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+const login = async (req, res) => {
+  const { token, user } = await authService.loginUser(req.body);
+  res.json({
+    token,
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
 };
 
-export const logout = async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    await authService.logout(id);
-    res.status(204).json();
-  } catch (error) {
-    next(error);
-  }
+const getCurrentUser = async (req, res) => {
+  const { email, subscription } = req.user;
+  res.json({
+    email,
+    subscription,
+  });
 };
 
-export const current = async (req, res, next) => {
-  try {
-    const { email, subscription } = req.user;
-    res.status(200).json({
-      email,
-      subscription,
-    });
-  } catch (error) {
-    next(error);
-  }
+const logout = async (req, res) => {
+  const { id } = req.user;
+  await authService.logoutUser(id);
+  res.status(204).send();
 };
 
-export const updateSubscription = async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const { subscription } = req.body;
-    const updatedUser = await authService.updateSubscription(id, subscription);
-    res.status(200).json({
-      user: {
-        email: updatedUser.email,
-        subscription: updatedUser.subscription,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+const updateUserSubscription = async (req, res) => {
+  const { id } = req.user;
+  const { subscription } = req.body;
+  const updatedUser = await authService.updateSubscription(id, subscription);
+  res.json({
+    email: updatedUser.email,
+    subscription: updatedUser.subscription,
+  });
+};
+
+export default {
+  register: controllerWrapper(register),
+  login: controllerWrapper(login),
+  getCurrentUser: controllerWrapper(getCurrentUser),
+  logout: controllerWrapper(logout),
+  updateUserSubscription: controllerWrapper(updateUserSubscription),
 };

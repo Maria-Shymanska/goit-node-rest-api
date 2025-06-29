@@ -1,69 +1,59 @@
-import User from "../db/user.js";
 import bcrypt from "bcrypt";
+import User from "../db/user.js";
+import HttpError from "../helpers/HttpError.js";
+import { generateToken } from "../helpers/jwt.js";
 
-class AuthService {
-  async register(email, password) {
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ email, password: hashedPassword });
+export const findUser = (query) =>
+  User.findOne({
+    where: query,
+  });
 
-      return user;
-    } catch (error) {
-      console.error("Error registering user:", error);
-      throw error;
-    }
+export const registerUser = async (userData) => {
+  const { email, password } = userData;
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    throw HttpError(409, "Email in use");
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  return User.create({ ...userData, password: hashedPassword });
+};
+
+export const loginUser = async (userData) => {
+  const { email, password } = userData;
+  const existingUser = await User.findOne({ where: { email } });
+  if (!existingUser) {
+    throw HttpError(401, "Email or password is wrong");
+  }
+  const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+  if (!isPasswordValid) {
+    throw HttpError(401, "Email or password is wrong");
   }
 
-  async verifyPassword(password, hashedPassword) {
-    try {
-      return await bcrypt.compare(password, hashedPassword);
-    } catch (error) {
-      console.error("Error verifying password:", error);
-      throw error;
-    }
-  }
+  const token = generateToken({
+    id: existingUser.id,
+  });
 
-  async getUserByEmail(email) {
-    try {
-      const user = await User.findOne({ where: { email } });
-      return user;
-    } catch (error) {
-      console.error("Error getting user by email:", error);
-      throw error;
-    }
-  }
+  await existingUser.update({ token });
 
-  async updateToken(id, token) {
-    try {
-      await User.update({ token }, { where: { id } });
-    } catch (error) {
-      console.error("Error updating token:", error);
-      throw error;
-    }
-  }
+  return {
+    token,
+    user: existingUser,
+  };
+};
 
-  async logout(id) {
-    try {
-      await User.update({ token: null }, { where: { id } });
-    } catch (error) {
-      console.error("Error logging out:", error);
-      throw error;
-    }
+export const logoutUser = async (userId) => {
+  const user = await findUser({ id: userId });
+  if (!user || !user.token) {
+    throw HttpError(404, "Not found");
   }
+  await user.update({ token: null });
+};
 
-  async updateSubscription(id, subscription) {
-    try {
-      await User.update({ subscription }, { where: { id } });
-      const updatedUser = await User.findOne({
-        where: { id },
-        attributes: ["email", "subscription"],
-      });
-      return updatedUser;
-    } catch (error) {
-      console.error("Error updating subscription:", error);
-      throw error;
-    }
+export const updateSubscription = async (userId, subscription) => {
+  const user = await findUser({ id: userId });
+  if (!user) {
+    throw HttpError(404, "Not found");
   }
-}
-
-export const authService = new AuthService();
+  await user.update({ subscription });
+  return user;
+};

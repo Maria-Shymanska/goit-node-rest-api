@@ -29,13 +29,4 @@ const Contact = sequelize.define("contact", {
   },
 });
 
-Contact.belongsTo(User, {
-  foreignKey: "owner",
-  onDelete: "CASCADE",
-});
-
-User.hasMany(Contact, {
-  foreignKey: "owner",
-});
-
 export default Contact;

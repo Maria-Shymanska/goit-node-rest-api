@@ -1,7 +1,7 @@
 import express from "express";
 import contactsControllers from "../controllers/contactsControllers.js";
 import validateBody from "../helpers/validateBody.js";
-import ctrlWrapper from "../helpers/ctrlWrapper.js";
+import ctrlWrapper from "../helpers/controllerWrapper.js";
 import auth from "../helpers/auth.js";
 import {
   createContactSchema,

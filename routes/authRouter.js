@@ -1,26 +1,20 @@
 import express from "express";
-import {
-  register,
-  login,
-  logout,
-  current,
-  updateSubscription,
-} from "../controllers/authControllers.js";
-import { userSchema, subscriptionSchema } from "../schemas/authSchema.js";
+import { authSchema, updateSubscriptionSchema } from "../schemas/authSchema.js";
 import validateBody from "../helpers/validateBody.js";
+import authController from "../controllers/authControllers.js";
 import auth from "../helpers/auth.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", validateBody(userSchema), register);
-authRouter.post("/login", validateBody(userSchema), login);
-authRouter.post("/logout", auth, logout);
-authRouter.get("/current", auth, current);
+authRouter.post("/register", validateBody(authSchema), authController.register);
+authRouter.post("/login", validateBody(authSchema), authController.login);
+authRouter.get("/current", auth, authController.getCurrentUser);
+authRouter.post("/logout", auth, authController.logout);
 authRouter.patch(
   "/subscription",
   auth,
-  validateBody(subscriptionSchema),
-  updateSubscription
+  validateBody(updateSubscriptionSchema),
+  authController.updateUserSubscription
 );
 
 export default authRouter;

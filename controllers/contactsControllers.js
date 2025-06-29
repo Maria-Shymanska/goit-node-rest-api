@@ -1,74 +1,91 @@
-import * as contactsService from "../services/contactsServices.js";
+import contactsService from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
-import ctrlWrapper from "../helpers/ctrlWrapper.js";
+import controllerWrapper from "../helpers/controllerWrapper.js";
 
-// Повертає всі контакти, що належать користувачу
-export const getAllContacts = async (req, res) => {
-  throw new Error("Test crash");
-  const result = await contactsService.listContacts(req.user.id);
-  res.json(result);
-};
-
-// Повертає один контакт, що належить користувачу
-export const getOneContact = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsService.getContactById(id, req.user.id);
-  if (!result) {
-    throw HttpError(404, "Not found");
+const getAllContacts = async (req, res) => {
+  const { id: userId } = req.user;
+  const { page = 1, limit = 20, favorite } = req.query;
+  const pageNum = Number(page) > 0 ? Number(page) : 1;
+  const limitNum = Number(limit) > 0 ? Number(limit) : 20;
+  let favoriteValue;
+  if (favorite !== undefined) {
+    favoriteValue = favorite === "true";
   }
-  res.json(result);
-};
-
-// Видаляє контакт, що належить користувачу
-export const deleteContact = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsService.removeContact(id, req.user.id);
-  if (!result) {
-    throw HttpError(404, "Not found");
-  }
-  res.json(result);
-};
-
-// Створює контакт з прив’язкою до користувача
-export const createContact = async (req, res) => {
-  const result = await contactsService.addContact({
-    ...req.body,
-    owner: req.user.id,
+  const contacts = await contactsService.listContacts(userId, {
+    page: pageNum,
+    limit: limitNum,
+    favorite: favoriteValue,
   });
-  res.status(201).json(result);
+  res.json(contacts);
 };
 
-// Оновлює контакт, перевіряючи власника
-export const updateContact = async (req, res) => {
+const getOneContact = async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.updateContact(id, req.body, req.user.id);
-  if (!result) {
+  const { id: userId } = req.user;
+  const contact = await contactsService.getContactById(userId, id);
+
+  if (!contact) {
     throw HttpError(404, "Not found");
   }
-  res.json(result);
+
+  res.json(contact);
 };
 
-// Оновлює поле favorite, перевіряючи власника
-export const updateStatusContact = async (req, res) => {
+const deleteContact = async (req, res) => {
   const { id } = req.params;
-  const { favorite } = req.body;
-  const result = await contactsService.updateStatusContact(
+  const { id: userId } = req.user;
+  const contact = await contactsService.removeContact(userId, id);
+
+  if (!contact) {
+    throw HttpError(404, "Not found");
+  }
+
+  res.json(contact);
+};
+
+const createContact = async (req, res) => {
+  const { id: userId } = req.user;
+  const newContact = await contactsService.addContact(userId, req.body);
+  res.status(201).json(newContact);
+};
+
+const updateContact = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  const updatedContact = await contactsService.updateContact(
+    userId,
     id,
-    { favorite },
-    req.user.id
+    req.body
   );
-  if (!result) {
+
+  if (!updatedContact) {
     throw HttpError(404, "Not found");
   }
 
-  res.status(200).json(result);
+  res.json(updatedContact);
+};
+
+const updateStatusContact = async (req, res) => {
+  const { contactId } = req.params;
+  const { id: userId } = req.user;
+  const updatedContact = await contactsService.updateStatusContact(
+    userId,
+    contactId,
+    req.body
+  );
+
+  if (!updatedContact) {
+    throw HttpError(404, "Not found");
+  }
+
+  res.json(updatedContact);
 };
 
 export default {
-  getAllContacts: ctrlWrapper(getAllContacts),
-  getOneContact: ctrlWrapper(getOneContact),
-  deleteContact: ctrlWrapper(deleteContact),
-  createContact: ctrlWrapper(createContact),
-  updateContact: ctrlWrapper(updateContact),
-  updateStatusContact: ctrlWrapper(updateStatusContact),
+  getAllContacts: controllerWrapper(getAllContacts),
+  getOneContact: controllerWrapper(getOneContact),
+  deleteContact: controllerWrapper(deleteContact),
+  createContact: controllerWrapper(createContact),
+  updateContact: controllerWrapper(updateContact),
+  updateStatusContact: controllerWrapper(updateStatusContact),
 };

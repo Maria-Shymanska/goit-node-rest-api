@@ -1,34 +1,52 @@
 import Contact from "../db/contacts.js";
 
-export async function listContacts() {
-  return await Contact.findAll();
+// Отримати всі контакти поточного користувача
+export async function listContacts(owner) {
+  return await Contact.findAll({ where: { owner } });
 }
 
-export async function getContactById(contactId) {
-  return await Contact.findByPk(contactId);
+// Отримати один контакт за id і owner
+export async function getContactById(owner, id) {
+  return await Contact.findOne({ where: { id, owner } });
 }
 
-export async function addContact({ name, email, phone }) {
-  return await Contact.create({ name, email, phone });
+// Додати новий контакт
+export async function addContact(
+  owner,
+  { name, email, phone, favorite = false }
+) {
+  return await Contact.create({ name, email, phone, favorite, owner });
 }
 
-export async function updateContact(id, data) {
-  const contact = await Contact.findByPk(id);
+// Оновити контакт
+export async function updateContact(owner, id, data) {
+  const contact = await Contact.findOne({ where: { id, owner } });
   if (!contact) return null;
   await contact.update(data);
   return contact;
 }
 
-export async function updateStatusContact(id, { favorite }) {
-  const contact = await Contact.findByPk(id);
+// Оновити статус "favorite"
+export async function updateStatusContact(owner, id, { favorite }) {
+  const contact = await Contact.findOne({ where: { id, owner } });
   if (!contact) return null;
   await contact.update({ favorite });
   return contact;
 }
 
-export async function removeContact(id) {
-  const contact = await Contact.findByPk(id);
+// Видалити контакт
+export async function removeContact(owner, id) {
+  const contact = await Contact.findOne({ where: { id, owner } });
   if (!contact) return null;
   await contact.destroy();
   return contact;
 }
+
+export default {
+  listContacts,
+  getContactById,
+  addContact,
+  updateContact,
+  updateStatusContact,
+  removeContact,
+};

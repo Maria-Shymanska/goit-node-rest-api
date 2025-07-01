@@ -6,7 +6,12 @@ import auth from "../helpers/auth.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", validateBody(authSchema), authController.register);
+authRouter.post(
+  "/register",
+  updload.single("avatar"),
+  validateBody(authSchema),
+  authController.register
+);
 authRouter.post("/login", validateBody(authSchema), authController.login);
 authRouter.get("/current", auth, authController.getCurrentUser);
 authRouter.post("/logout", auth, authController.logout);

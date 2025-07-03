@@ -27,10 +27,10 @@ const fileFilter = (req, file, callback) => {
   callback(null, true);
 };
 
-const updload = multer({
+const upload = multer({
   storage,
   limits,
   fileFilter,
 });
 
-export default updload;
+export default upload;

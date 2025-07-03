@@ -21,8 +21,10 @@ const User = sequelize.define("user", {
     allowNull: true,
     defaultValue: null,
   },
-  avatarURL: DataTypes.STRING,
-  allowNull: false,
+  avatarURL: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 export default User;

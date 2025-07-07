@@ -1,5 +1,9 @@
 import express from "express";
-import { authSchema, updateSubscriptionSchema } from "../schemas/authSchema.js";
+import {
+  authSchema,
+  updateSubscriptionSchema,
+  authVerifySchema,
+} from "../schemas/authSchema.js";
 import validateBody from "../helpers/validateBody.js";
 import authController from "../controllers/authControllers.js";
 import auth from "../helpers/auth.js";
@@ -12,6 +16,12 @@ authRouter.post(
   upload.single("avatar"),
   validateBody(authSchema),
   authController.register
+);
+authRouter.get("/verify/:verificationToken", authController.verifyEmail);
+authRouter.post(
+  "/verify",
+  validateBody(authVerifySchema),
+  authController.resendVerificationEmail
 );
 authRouter.post("/login", validateBody(authSchema), authController.login);
 authRouter.get("/current", auth, authController.getCurrentUser);
